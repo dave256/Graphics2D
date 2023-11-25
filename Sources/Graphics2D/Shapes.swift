@@ -73,3 +73,7 @@ public extension UnitCircle {
         Transform.zeroOrMoreParser
     }
 }
+
+// use default Drawable draw implementation since these are PathDrawable
+extension UnitCircle: Drawable {}
+extension UnitSquare: Drawable {}
