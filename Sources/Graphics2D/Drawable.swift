@@ -93,13 +93,28 @@ public protocol Drawable {
     func draw(context: GraphicsContext)
 }
 
-public protocol PathDrawable: Drawable {
-    var path: Path { get }
-    var drawStyle: DrawStyle { get }
-    var transforms: [Transform] { get }
-}
+public struct PathDrawable: Drawable, Transformable, Equatable {
+    public init(path: Path, drawStyle: DrawStyle, transforms: [Transform]) {
+        self.path = path
+        self.drawStyle = drawStyle
+        self.transforms = transforms
+        self.transform = transforms.combined
+    }
 
-extension PathDrawable {
+    /// path for the shape that is drawn
+    public let path: Path
+
+    /// how to draw: (line option for Polyline, or shape, or filled) and the color to use
+    public let drawStyle: DrawStyle
+    public var transforms: [Transform] {
+        // make certain the transform property stays updated when transforms change
+        didSet {
+            transform = transforms.combined
+        }
+    }
+    /// composite transform applied to the shape
+    public private(set) var transform: CGAffineTransform
+
     public func draw(context: GraphicsContext) {
         let transform = transforms.combined.concatenating(context.transform)
         let tfm = transform.concatenating(context.transform)
@@ -122,7 +137,25 @@ extension PathDrawable {
         case .filled:
             // draw filled shape
             context.fill(p, with: .color(drawStyle.color.color))
-
         }
     }
+
 }
+
+public protocol PathDrawableConvertible {
+    static func pathDrawable(path: Path, drawStyle: DrawStyle, transforms: [Transform]) -> PathDrawable
+}
+
+extension PathDrawableConvertible {
+    public static func pathDrawable(path: Path, drawStyle: DrawStyle, transforms: [Transform]) -> PathDrawable {
+        PathDrawable(path: path, drawStyle: drawStyle, transforms: transforms)
+    }
+}
+
+
+//public protocol PathDrawable: Drawable {
+//    var path: Path { get }
+//    var drawStyle: DrawStyle { get }
+//    var transforms: [Transform] { get }
+//}
+
