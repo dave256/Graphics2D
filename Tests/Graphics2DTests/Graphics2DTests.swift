@@ -107,3 +107,38 @@ final class TransformParsingTests: XCTestCase {
         XCTAssertEqual(output, expected)
     }
 }
+
+final class DrawStyleParsingTests: XCTestCase {
+
+    func testParseDrawableStyle() throws {
+        var input: Substring = "path red"
+        var ds = try DrawStyle.parser.parse(input)
+        XCTAssertEqual(ds, DrawStyle(style: .path, color: .red))
+
+        input = "closed blue"
+        ds = try DrawStyle.parser.parse(input)
+        XCTAssertEqual(ds, DrawStyle(style: .closed, color: .blue))
+
+        input = "filled green"
+        ds = try DrawStyle.parser.parse(input)
+        XCTAssertEqual(ds, DrawStyle(style: .filled, color: .green))
+    }
+
+    func testPrintDrawableStyle() throws {
+        var expected: Substring = "path red"
+        var ds = DrawStyle(style: .path, color: .red)
+        var output = try DrawStyle.parser.print(ds)
+        XCTAssertEqual(expected, output)
+
+        expected = "closed blue"
+        ds = DrawStyle(style: .closed, color: .blue)
+        output = try DrawStyle.parser.print(ds)
+        XCTAssertEqual(expected, output)
+
+        expected = "filled green"
+        ds = DrawStyle(style: .filled, color: .green)
+        output = try DrawStyle.parser.print(ds)
+        XCTAssertEqual(expected, output)
+    }
+}
+
